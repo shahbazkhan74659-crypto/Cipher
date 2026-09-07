@@ -42,7 +42,7 @@ Each version below lists: goal, features, architecture additions, and the learni
 
 ### v0.1 — Basic AI Assistant
 **Goal:** Understand LLM APIs and basic application architecture.
-**Features:** Text input, text response, basic conversation, basic configuration, model abstraction (one interface, one provider behind it to start).
+**Features:** Text input, text response, basic conversation, basic configuration, model abstraction (one interface, one provider behind it to start). The provider is a **free-tier cloud LLM API** (e.g. Gemini, Groq, or OpenRouter's free models) — see `LLM.md` for why, given the current machine's hardware.
 **Architecture:** `User -> LLM -> Response`.
 **Learn:** LLM API mechanics (requests, tokens, context windows, streaming), basic prompt design, Python project structure/packaging, config management, logging basics.
 
@@ -119,6 +119,8 @@ Not scheduled — directions to grow into once v1.0 is real and stable:
 ## Hardware & Budget Constraints (current)
 
 Cipher starts **cloud-first**: hosted LLM APIs, CPU-friendly local components, free/low-cost services where practical. Every model-facing component (LLM, embeddings, STT, TTS) sits behind an interface from v0.1 onward specifically so that local or hybrid execution can be swapped in later without a rewrite, once better hardware is available. The architecture is not designed around a GPU we don't currently have.
+
+**Measured, not assumed (2026-09-07):** current development machine is an AMD Ryzen 3 5425U (4C/8T), integrated AMD Radeon graphics (no dedicated GPU/VRAM), 7.35 GB RAM. Per `LLM.md`'s sizing table this supports roughly 1-3B quantized models locally at best — nowhere near enough for a capable "main brain," and not enough to run several specialized local models concurrently. This is why v0.1 calls a **free-tier cloud API** rather than a self-hosted model: it's the only option that gives Cipher a genuinely useful assistant at zero dollar cost on this hardware. Local inference on this machine remains available as a small, separate learning exercise (`DEVELOPMENT.md` — concepts too large/tangential for Cipher's own codebase get their own standalone project), not as Cipher's v0.1 path. Revisit once real GPU hardware exists (see `LLM.md`'s trigger conditions).
 
 ## Success Criteria
 

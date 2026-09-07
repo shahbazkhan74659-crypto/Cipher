@@ -6,6 +6,10 @@ This is a **reference doc**, not a roadmap change. It exists to capture model-si
 
 Cipher is **cloud-first** through v0.1–v1.0: hosted LLM APIs behind the model-agnostic interface (`ARCHITECTURE.md` §4). Local model execution is listed under **"Beyond v1.0"** in `ROADMAP.md` — a future option, not a current requirement. "No GPU yet" is a reason to stay cloud-first, not a reason to squeeze a quantized model onto CPU early.
 
+**v0.1 specifically uses a free-tier cloud LLM API** (e.g. Gemini, Groq, or OpenRouter's free models) rather than a paid API or a self-hosted model — this satisfies the zero-dollar-cost goal without taking on local inference infrastructure before v0.1's "Simple → Working" step needs it (`ROADMAP.md`). The `LLMClient` interface stays swappable either way, so moving to a paid tier or a different free provider later is a contained change.
+
+This decision is backed by a measured hardware check (2026-09-07), not a guess: the current dev machine is an AMD Ryzen 3 5425U (4C/8T) with integrated AMD Radeon graphics — no dedicated GPU/VRAM — and 7.35 GB RAM. Per the sizing table below, that ceiling is ~1-3B quantized models, which rules out a locally-hosted "main brain" outright. Local inference on this machine is worth exploring as a small standalone learning exercise, not as Cipher's actual v0.1 path.
+
 This doc exists so that when a local model *does* become relevant, the sizing math doesn't have to be re-derived from scratch.
 
 ## When Local Actually Becomes Relevant
