@@ -1,9 +1,14 @@
 """Configuration loading for Cipher.
 
-Reads settings from environment variables, loading a local .env file first
-(if present) without overriding any variable already set in the real
+Reads settings from environment variables, loading a .env file first (if
+present) without overriding any variable already set in the real
 environment. No third-party .env parser — the format needed is trivial
 (KEY=VALUE lines).
+
+.env is looked up in two places, in order: the current directory (lets a
+.env there override/scope things per-invocation), then the project root
+(so `cipher` still finds its config when run from anywhere on the system,
+e.g. via a shell alias, not just from inside the project directory).
 """
 
 import os
@@ -12,6 +17,7 @@ from pathlib import Path
 from pydantic import BaseModel, ValidationError
 
 DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 class ConfigError(Exception):
@@ -42,6 +48,7 @@ def _load_dotenv(path: Path) -> None:
 
 def load_settings() -> Settings:
     _load_dotenv(Path.cwd() / ".env")
+    _load_dotenv(PROJECT_ROOT / ".env")
 
     try:
         return Settings(

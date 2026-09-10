@@ -26,6 +26,9 @@ def test_load_settings_reads_env_file(tmp_path, monkeypatch):
 
 def test_load_settings_missing_api_key_raises_config_error(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
+    # Isolate from the real project's .env, which the PROJECT_ROOT fallback
+    # would otherwise find (tmp_path itself has no .env either).
+    monkeypatch.setattr("cipher.config.PROJECT_ROOT", tmp_path)
 
     with pytest.raises(ConfigError, match="OPENROUTER_API_KEY"):
         load_settings()
@@ -81,3 +84,36 @@ def test_load_dotenv_strips_surrounding_quotes(tmp_path, monkeypatch):
 def test_load_dotenv_missing_file_is_a_noop(tmp_path):
     _load_dotenv(tmp_path / "does-not-exist.env")
     # No exception means success — nothing to assert on environment.
+
+
+def test_load_settings_falls_back_to_project_root_when_cwd_has_no_env(
+    tmp_path, monkeypatch
+):
+    cwd_dir = tmp_path / "elsewhere"
+    cwd_dir.mkdir()
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    write_env(project_dir, "OPENROUTER_API_KEY=from-project-root\n")
+
+    monkeypatch.chdir(cwd_dir)
+    monkeypatch.setattr("cipher.config.PROJECT_ROOT", project_dir)
+
+    settings = load_settings()
+
+    assert settings.openrouter_api_key == "from-project-root"
+
+
+def test_load_settings_cwd_env_wins_over_project_root_env(tmp_path, monkeypatch):
+    cwd_dir = tmp_path / "elsewhere"
+    cwd_dir.mkdir()
+    write_env(cwd_dir, "OPENROUTER_API_KEY=from-cwd\n")
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    write_env(project_dir, "OPENROUTER_API_KEY=from-project-root\n")
+
+    monkeypatch.chdir(cwd_dir)
+    monkeypatch.setattr("cipher.config.PROJECT_ROOT", project_dir)
+
+    settings = load_settings()
+
+    assert settings.openrouter_api_key == "from-cwd"
