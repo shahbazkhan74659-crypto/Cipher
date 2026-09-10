@@ -1,8 +1,8 @@
 """Cipher's terminal CLI shell.
 
-Phase 3: each input is sent as a single standalone message to OpenRouter
-(no conversation history yet — that's Phase 4) and the real reply is
-printed in place of Phase 2's echo placeholder.
+Phase 4: a running conversation history (with a system prompt) is threaded
+through each call, so the model has memory of prior turns within a session.
+History is in-memory only — lost on exit (persistence is v0.5, MEMORY.md).
 """
 
 import asyncio
@@ -19,11 +19,14 @@ from cipher.openrouter_client import OpenRouterClient
 logger = logging.getLogger(__name__)
 
 EXIT_COMMANDS = {"exit", "quit"}
+SYSTEM_PROMPT = "You are Cipher, a helpful personal AI assistant."
 
 
 async def main(client: LLMClient) -> None:
     print("Cipher v0.1 — terminal shell. Type 'exit' to quit.")
     logger.info("CLI session started")
+
+    history: list[dict[str, str]] = [{"role": "system", "content": SYSTEM_PROMPT}]
 
     while True:
         try:
@@ -41,13 +44,17 @@ async def main(client: LLMClient) -> None:
         if text.lower() in EXIT_COMMANDS:
             break
 
+        history.append({"role": "user", "content": text})
+
         try:
-            reply = await client.complete([{"role": "user", "content": text}])
+            reply = await client.complete(history)
         except LLMClientError as e:
             print(f"Cipher: [error] {e}")
             logger.error("LLM call failed: %s", e)
+            history.pop()  # drop the unanswered turn, keep history clean
             continue
 
+        history.append({"role": "assistant", "content": reply})
         print(f"Cipher: {reply}")
 
     print("Goodbye.")

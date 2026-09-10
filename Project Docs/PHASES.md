@@ -28,8 +28,8 @@ A terminal-runnable CLI shell for Cipher — no LLM wiring yet. Delivered: `pypr
 ### Phase 3 — Connecting the CLI and OpenRouter Model ✅ Completed
 Wire the CLI to OpenRouter so a request actually reaches the model and a response comes back. Delivered: `config.py` (stdlib `.env` loader + Pydantic `Settings`), `llm_client.py` (model-agnostic `LLMClient` interface + `LLMClientError`), `openrouter_client.py` (`OpenRouterClient`, single request/response, real error handling for network/timeout/rate-limit/malformed-response/embedded-error-in-200 cases), `cli.py` wired to call it (single-turn, no history yet — that's Phase 4). First real runtime dependencies added: `httpx`, `pydantic`. Confirmed working end-to-end with a real OpenRouter round-trip. Surfaced and resolved two real issues, not code bugs: (1) the documented primary model (`thinkingmachines/inkling-small:free`) 403s outside "agentic harness" integrations; (2) its first replacement, `nemotron-3-ultra-550b-a55b:free`, worked but timed out ~30-40% of the time. Settled on `nvidia/nemotron-3-super-120b-a12b:free` as primary — 5/5 successful test calls, much faster (see `LLM.md`).
 
-### Phase 4 — Simple Text Input, Text Response, and Basic Conversation
-Interactive text in/out through the CLI, with basic multi-turn conversation.
+### Phase 4 — Simple Text Input, Text Response, and Basic Conversation ✅ Completed
+Interactive text in/out through the CLI, with basic multi-turn conversation. Delivered: a running in-memory conversation history (with a minimal system prompt giving Cipher a basic identity) threaded through each `OpenRouterClient.complete()` call — confirmed the model correctly recalls facts from earlier turns. A failed turn (`LLMClientError`) is popped back off history so it doesn't leave an orphaned/unanswered entry confusing later turns. No persistence across restarts, no context trimming, no history-reset command — out of scope per `MEMORY.md`'s v0.5 boundary and v0.1's scale.
 
 ### Phase 5 — Polishing and End-to-End Testing of v0.1 (User -> LLM -> Response)
 Harden and verify the full `User -> LLM -> Response` path end-to-end.

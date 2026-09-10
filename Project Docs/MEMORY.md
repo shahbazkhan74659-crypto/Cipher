@@ -58,11 +58,11 @@ Sources: local documents, project documentation, personal notes, PDFs, codebases
 
 ## Storage — Candidates, Not Decisions
 
-Nothing below is committed; these are the reasonable default candidates to evaluate when v0.5 is actually built, consistent with the cloud-first/CPU-friendly constraint in `ROADMAP.md`:
+Nothing below is committed except where marked **Decided**; the rest are reasonable default candidates to evaluate when v0.5 is actually built, consistent with the cloud-first/CPU-friendly constraint in `ROADMAP.md`:
 
 - Structured state (short-term/task state, preferences): SQLite to start — simple, file-based, no server to run.
 - Vector storage (embeddings for RAG): a lightweight embedded/vector-capable store to start; revisit if scale demands a dedicated vector DB.
-- Long-term factual memory: likely layered on the same SQLite store initially, with retrieval logic distinguishing it from RAG knowledge chunks.
+- **Long-term factual memory — Decided (2026-09-10): plain markdown (`.md`) files, not a database row.** Same mechanism as Claude Code's own `CLAUDE.md`-style memory: human-readable, user-editable, git-trackable files rather than an opaque DB table. This is a better fit than SQLite for long-term memory specifically because a file diff *is* the reviewable record `SECURITY.md` requires for long-term writes ("Long-term memory writes should themselves be a reviewable, not-silent action") — no separate UI needed to inspect what Cipher remembers, the user can read/edit/delete it directly. Distinct from Knowledge/RAG, which stays a vector-DB candidate above — markdown files don't need to scale to fast similarity search, they hold curated, deliberately-written facts/preferences, not bulk document content.
 
 ## Data Handling Principle
 
