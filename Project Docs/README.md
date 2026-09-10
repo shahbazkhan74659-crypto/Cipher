@@ -22,7 +22,7 @@ That end state is the destination, not the starting point. See `ROADMAP.md` for 
 
 ## Project Status
 
-**v0.1 complete.** Planning locked down the concept, architecture, security posture, and incremental build plan (through 2026-09-09). As of 2026-09-10, v0.1 ("Basic AI Assistant", `User -> LLM -> Response`) is done — a terminal CLI with real multi-turn conversation through OpenRouter, an automated test suite, and hardened error handling (Phases 1-5 of 5). Next milestone: v0.2 — Tool Calling (`ROADMAP.md`). Full detail and decision history in `PHASES.md`, `LLM.md`, and `CHANGELOG.md`.
+**v0.2 starting.** v0.1 ("Basic AI Assistant", `User -> LLM -> Response`) is complete as of 2026-09-10 — a terminal CLI with real multi-turn conversation through OpenRouter, an automated test suite, and hardened error handling (Phases 1-5 of 5). As of 2026-09-10, work has moved to v0.2 — Tool Calling (`User -> LLM -> Tool Selection -> Tool -> Result -> LLM -> Response`, `ROADMAP.md`); no v0.2 phases are defined yet. Full detail and decision history in `PHASES.md`, `LLM.md`, and `CHANGELOG.md`.
 
 ## Document Map
 
@@ -31,7 +31,7 @@ That end state is the destination, not the starting point. See `ROADMAP.md` for 
 | `README.md` | This file — orientation and navigation. |
 | `ARCHITECTURE.md` | The target (v1.0+) system architecture and the design principles every version must respect. |
 | `ROADMAP.md` | Version-by-version build plan (v0.1 → v1.0 → beyond), with a personalized learning path mapped to each version. |
-| `PHASES.md` | Implementation-phase breakdown for the version currently being built (v0.1) — the ordered build steps within a version. |
+| `PHASES.md` | Implementation-phase breakdown for the version currently being built (v0.2) — the ordered build steps within a version; completed versions' phases are kept as a record. |
 | `SECURITY.md` | The security model: risk tiers, permission checks, sandboxing, audit logging. Non-negotiable, applies from v0.2 onward. |
 | `TOOLS.md` | The tool interface contract and the tool catalog, organized by capability domain. |
 | `MEMORY.md` | Cipher's own memory system design (short-term, long-term, knowledge/RAG) — distinct from any assistant's session memory. |

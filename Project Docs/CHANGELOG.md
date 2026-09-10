@@ -4,6 +4,10 @@ All notable changes to the Cipher project are recorded here. Format loosely foll
 
 ## [Unreleased]
 
+v0.2 — Tool Calling started (2026-09-10). No phases defined yet (`PHASES.md`).
+
+## [0.1.0] - 2026-09-10 - Basic AI Assistant
+
 v0.1 — Basic AI Assistant complete (Phases 1-5, see `PHASES.md`).
 
 ### Added

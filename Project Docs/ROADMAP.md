@@ -48,13 +48,13 @@ Each version below lists: goal, features, architecture additions, and the learni
 
 ### v0.2 — Tool Calling
 **Goal:** Understand tool/function calling and controlled execution.
-**Features:** Calculator, time/date, basic filesystem read tools, controlled command execution, a tool registry, tool selection.
+**Features:** Calculator, time/date, basic filesystem read tools, a tool registry, tool selection. (Controlled command execution moved to v0.3 — `TOOLS.md`'s catalog and `SECURITY.md`'s confirmation-prompt mechanism both scope it there, not here.)
 **Architecture:** `User -> LLM -> Tool Selection -> Tool -> Result -> LLM -> Response`.
 **Learn:** Function/tool calling mechanics, structured outputs, the "LLM output is not a trusted command" boundary (`SECURITY.md`), first pass at risk tiers and allowlists.
 
 ### v0.3 — Computer Control
 **Goal:** Safe interaction with the local OS.
-**Features:** Open/close applications, process management, full filesystem CRUD, keyboard/mouse automation, basic system info. Permission checks and confirmation prompts introduced here — not optional.
+**Features:** Open/close applications, process management, controlled command execution, full filesystem CRUD, keyboard/mouse automation, basic system info. Permission checks and confirmation prompts introduced here — not optional.
 **Architecture:** OS/Files adapters behind the Tool Router; permission layer sits in front of every tool call.
 **Learn:** Windows process/permission model, accessibility APIs, the interface-preference hierarchy (`ARCHITECTURE.md` §3), why GUI automation is a last resort not a default.
 
