@@ -12,6 +12,23 @@ This decision is backed by a measured hardware check (2026-09-07), not a guess: 
 
 This doc exists so that when a local model *does* become relevant, the sizing math doesn't have to be re-derived from scratch.
 
+## v0.1 Free-Tier Model Selection (OpenRouter)
+
+Evaluated OpenRouter's live free-model catalog (`:free` suffix, $0 prompt/completion pricing) on 2026-09-09 against Artificial Analysis benchmark scores (intelligence/coding/agentic indices), context length, and tool-calling support.
+
+| Model | Role | Intelligence | Coding | Agentic | Context | Tools |
+|---|---|---|---|---|---|---|
+| `thinkingmachines/inkling-small:free` | **Primary** | 26.1 | 52.9 | 25.0 | 1,048,576 | Yes |
+| `nvidia/nemotron-3-ultra-550b-a55b:free` | Fallback | 23.4 | 49.3 | 21.7 | 1,000,000 | Yes |
+| `thinkingmachines/inkling:free` | Fallback | 25.5 | 52.1 | 24.3 | 1,048,576 | Yes |
+| `google/gemma-4-31b-it:free` | Fallback | 15.4 | 43.4 | 6.7 | 262,144 | Yes |
+
+**Primary: `thinkingmachines/inkling-small:free`.** Best benchmark scores in the free pool despite being the most parameter-efficient of the four (12B active / 276B total MoE) — outscores its own larger sibling (`inkling`, 41B active / 975B total) and NVIDIA's 550B `nemotron-3-ultra`. Supports tool/function calling (needed starting v0.2) and a 1M+ token context window (headroom for v0.5 memory/RAG and v0.8 coding — not needed yet, just doesn't block later).
+
+**Fallbacks are manual, not routed.** Per `ROADMAP.md` v0.1 ("one interface, one provider behind it to start") and the "never implement a future version's complexity early" working agreement, these three are *not* wired into automatic multi-model routing — that's explicitly a "Beyond v1.0" item (`ROADMAP.md`). They're a documented, manually-swappable option if the primary hits OpenRouter's free-tier rate limit (20 req/min; 50/day, or 1,000/day with $10+ lifetime credits purchased). OpenRouter's docs don't explicitly confirm whether that quota is pooled account-wide or bucketed per model, but their own guidance to "spread load across models" when rate-limited implies separate buckets — unverified, would need an empirical check.
+
+Re-evaluate this table if OpenRouter's free catalog changes materially, or when v0.2+ needs push the decision (e.g. a fallback turns out to be the better tool-calling fit).
+
 ## When Local Actually Becomes Relevant
 
 Not "as soon as I get a GPU." A concrete trigger, e.g.:
