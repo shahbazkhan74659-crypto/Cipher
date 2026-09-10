@@ -14,20 +14,21 @@ This doc exists so that when a local model *does* become relevant, the sizing ma
 
 ## v0.1 Free-Tier Model Selection (OpenRouter)
 
-Evaluated OpenRouter's live free-model catalog (`:free` suffix, $0 prompt/completion pricing) on 2026-09-09 against Artificial Analysis benchmark scores (intelligence/coding/agentic indices), context length, and tool-calling support.
+**Original evaluation (2026-09-09)** used Artificial Analysis benchmark scores (intelligence/coding/agentic indices) against OpenRouter's free-model catalog and picked `thinkingmachines/inkling-small:free` as primary. **Superseded (2026-09-10)** once Phase 3's live CLI testing showed benchmark scores alone weren't sufficient — actual reachability and free-tier latency/reliability matter just as much for a model Cipher will actually call.
 
-| Model | Role | Intelligence | Coding | Agentic | Context | Tools |
-|---|---|---|---|---|---|---|
-| `thinkingmachines/inkling-small:free` | **Primary** | 26.1 | 52.9 | 25.0 | 1,048,576 | Yes |
-| `nvidia/nemotron-3-ultra-550b-a55b:free` | Fallback | 23.4 | 49.3 | 21.7 | 1,000,000 | Yes |
-| `thinkingmachines/inkling:free` | Fallback | 25.5 | 52.1 | 24.3 | 1,048,576 | Yes |
-| `google/gemma-4-31b-it:free` | Fallback | 15.4 | 43.4 | 6.7 | 262,144 | Yes |
+| Model | Status | Notes |
+|---|---|---|
+| `nvidia/nemotron-3-super-120b-a12b:free` | **Primary** (2026-09-10) | 120B total / 12B active MoE. 5/5 successful test calls, 2.6-22s response time (~8s avg). Tools: yes. Context: 262,144. |
+| `nvidia/nemotron-3-ultra-550b-a55b:free` | Fallback (demoted 2026-09-10) | 550B total / 55B active MoE. Was primary briefly — worked but slow/unreliable: 3/5 successful, 2 outright timeouts (one past 30s, one past 60s). Keep as a documented manual fallback for when `nemotron-3-super` is itself rate-limited; don't default to it. Tools: yes. Context: 1,000,000. |
+| ~~`thinkingmachines/inkling-small:free`~~ | Rejected (2026-09-10) | `HTTP 403 Forbidden`: *"only available on agentic harnesses. Try plugging it into a coding agent or productivity app listed on https://openrouter.ai/apps."* Gated to recognized integrations Cipher's plain HTTP client isn't part of — a real access restriction, not a code bug (error handling caught and reported it correctly). Was the original 2026-09-09 pick on benchmark scores alone. |
+| `thinkingmachines/inkling:free` | Untested / suspect | Same provider/family as the rejected `inkling-small` — presumed to carry the same "agentic harness" restriction. Not verified either way. |
+| `google/gemma-4-31b-it:free` | Untested / inconclusive | Returned `429` rate-limiting (provider-side) on every attempt during testing (2026-09-10). Not ruled out, just never got a clean response to evaluate. |
 
-**Primary: `thinkingmachines/inkling-small:free`.** Best benchmark scores in the free pool despite being the most parameter-efficient of the four (12B active / 276B total MoE) — outscores its own larger sibling (`inkling`, 41B active / 975B total) and NVIDIA's 550B `nemotron-3-ultra`. Supports tool/function calling (needed starting v0.2) and a 1M+ token context window (headroom for v0.5 memory/RAG and v0.8 coding — not needed yet, just doesn't block later).
+**Why `nemotron-3-super` over `nemotron-3-ultra`:** same provider/account path already confirmed reachable (lower risk of a new 403), but roughly 1/4 the active parameters (12B vs 55B) — which tracks directly with the large speed/reliability difference observed. Cipher's request timeout is 60s (`cli.py`) to give free-tier latency headroom generally, not tuned to either model specifically.
 
-**Fallbacks are manual, not routed.** Per `ROADMAP.md` v0.1 ("one interface, one provider behind it to start") and the "never implement a future version's complexity early" working agreement, these three are *not* wired into automatic multi-model routing — that's explicitly a "Beyond v1.0" item (`ROADMAP.md`). They're a documented, manually-swappable option if the primary hits OpenRouter's free-tier rate limit (20 req/min; 50/day, or 1,000/day with $10+ lifetime credits purchased). OpenRouter's docs don't explicitly confirm whether that quota is pooled account-wide or bucketed per model, but their own guidance to "spread load across models" when rate-limited implies separate buckets — unverified, would need an empirical check.
+**Fallbacks are manual, not routed.** Per `ROADMAP.md` v0.1 ("one interface, one provider behind it to start") and the "never implement a future version's complexity early" working agreement, fallback models are *not* wired into automatic multi-model routing — that's explicitly a "Beyond v1.0" item (`ROADMAP.md`) and the reason `OmniRoute` was rejected below. They're a documented, manually-swappable option (via `CIPHER_MODEL` env var) if the primary is rate-limited or down. OpenRouter's free-tier rate limit is 20 req/min; 50/day, or 1,000/day with $10+ lifetime credits purchased — docs don't confirm whether that's pooled account-wide or bucketed per model.
 
-Re-evaluate this table if OpenRouter's free catalog changes materially, or when v0.2+ needs push the decision (e.g. a fallback turns out to be the better tool-calling fit).
+Re-evaluate this table if OpenRouter's free catalog changes materially, or when v0.2+ needs push the decision (e.g. tool-calling reliability under real use, not just the `tools` capability flag).
 
 ## Future Candidate: Automatic Multi-Provider Routing (OmniRoute)
 

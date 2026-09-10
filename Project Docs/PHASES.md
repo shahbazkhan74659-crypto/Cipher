@@ -8,7 +8,7 @@
 
 **Goal:** Understand LLM APIs and basic application architecture.
 **Target architecture:** `User -> LLM -> Response`.
-**Provider:** OpenRouter, free-tier, `thinkingmachines/inkling-small:free` primary (`LLM.md`).
+**Provider:** OpenRouter, free-tier, `nvidia/nemotron-3-super-120b-a12b:free` primary (`LLM.md` — originally `thinkingmachines/inkling-small:free`, rejected during Phase 3 testing as it 403s outside recognized "agentic harness" integrations; briefly `nemotron-3-ultra-550b-a55b:free`, demoted to fallback for reliability).
 
 ## Stack
 
@@ -25,8 +25,8 @@ Account confirmed, API key generated ("Cipher v0.1"), stored in `.env` (gitignor
 ### Phase 2 — Create a CLI for Cipher to Run on Terminal ✅ Completed
 A terminal-runnable CLI shell for Cipher — no LLM wiring yet. Delivered: `pyproject.toml` + `src/cipher/` package (hatchling, zero runtime deps), venv + editable install, async input loop (`python -m cipher` / `cipher` console script) with stdlib logging and a placeholder echo response, clean exit on `exit`/`quit`/Ctrl+C/Ctrl+D.
 
-### Phase 3 — Connecting the CLI and OpenRouter Model
-Wire the CLI to OpenRouter so a request actually reaches the model and a response comes back.
+### Phase 3 — Connecting the CLI and OpenRouter Model ✅ Completed
+Wire the CLI to OpenRouter so a request actually reaches the model and a response comes back. Delivered: `config.py` (stdlib `.env` loader + Pydantic `Settings`), `llm_client.py` (model-agnostic `LLMClient` interface + `LLMClientError`), `openrouter_client.py` (`OpenRouterClient`, single request/response, real error handling for network/timeout/rate-limit/malformed-response/embedded-error-in-200 cases), `cli.py` wired to call it (single-turn, no history yet — that's Phase 4). First real runtime dependencies added: `httpx`, `pydantic`. Confirmed working end-to-end with a real OpenRouter round-trip. Surfaced and resolved two real issues, not code bugs: (1) the documented primary model (`thinkingmachines/inkling-small:free`) 403s outside "agentic harness" integrations; (2) its first replacement, `nemotron-3-ultra-550b-a55b:free`, worked but timed out ~30-40% of the time. Settled on `nvidia/nemotron-3-super-120b-a12b:free` as primary — 5/5 successful test calls, much faster (see `LLM.md`).
 
 ### Phase 4 — Simple Text Input, Text Response, and Basic Conversation
 Interactive text in/out through the CLI, with basic multi-turn conversation.

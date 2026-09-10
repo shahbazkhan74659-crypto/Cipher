@@ -9,9 +9,14 @@ v0.1 — Basic AI Assistant is in progress (see `PHASES.md`).
 ### Added
 - Phase 1: OpenRouter account confirmed, API key generated, stored in `.env` (gitignored).
 - Phase 2: Python project scaffolding — `pyproject.toml` (hatchling backend, no runtime dependencies yet), `src/cipher/` package, venv, editable install. Terminal CLI shell (`python -m cipher` / `cipher` command): async input loop (`asyncio.run` + `asyncio.to_thread`), stdlib logging to stderr, clean exit on `exit`/`quit`/Ctrl+C/Ctrl+D. Responses are a placeholder echo — no OpenRouter wiring yet (Phase 3).
+- Phase 3: CLI wired to a real OpenRouter model call (single-turn, no history yet — Phase 4). Added `config.py` (stdlib `.env` loader + Pydantic `Settings`), `llm_client.py` (model-agnostic `LLMClient` interface), `openrouter_client.py` (`OpenRouterClient`, real error handling for timeouts/network errors/rate limits/malformed responses/embedded errors in HTTP 200 bodies). First runtime dependencies: `httpx`, `pydantic`.
+
+### Fixed
+- `thinkingmachines/inkling-small:free` (originally documented v0.1 primary model) turned out to 403 outside recognized "agentic harness" integrations — not usable from Cipher's CLI. First replacement, `nvidia/nemotron-3-ultra-550b-a55b:free`, worked but timed out ~30-40% of the time under free-tier load. Settled on `nvidia/nemotron-3-super-120b-a12b:free` as default model — 5/5 successful test calls, faster and more reliable (see `LLM.md`).
+- `OpenRouterClient` now retries up to 3 total attempts (2s delay) for clearly-transient failures — HTTP 429/5xx and embedded provider errors with a 5xx-style code (e.g. observed "Upstream error from Nvidia: Service temporarily overloaded") — before surfacing an error. Retries the same configured model only; not auto-fallback across models (`LLM.md`: "fallbacks are manual, not routed").
 
 ### Notes
-- Next milestone: Phase 3 — connect the CLI to the OpenRouter model.
+- Next milestone: Phase 4 — basic multi-turn conversation.
 
 ## [0.0.0] - 2026-08-31 - Planning
 

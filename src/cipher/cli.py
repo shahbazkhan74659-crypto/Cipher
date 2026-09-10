@@ -1,22 +1,28 @@
 """Cipher's terminal CLI shell.
 
-Phase 2: a placeholder loop only — input in, echo out. No OpenRouter call yet
-(that's Phase 3). Built async from the start so Phase 3 can add the real
-async model call into this same loop without a rewrite.
+Phase 3: each input is sent as a single standalone message to OpenRouter
+(no conversation history yet — that's Phase 4) and the real reply is
+printed in place of Phase 2's echo placeholder.
 """
 
 import asyncio
 import logging
+import sys
 
+import httpx
+
+from cipher.config import ConfigError, load_settings
+from cipher.llm_client import LLMClient, LLMClientError
 from cipher.logging_setup import configure_logging
+from cipher.openrouter_client import OpenRouterClient
 
 logger = logging.getLogger(__name__)
 
 EXIT_COMMANDS = {"exit", "quit"}
 
 
-async def main() -> None:
-    print("Cipher v0.1 — terminal shell (LLM not wired yet, Phase 3). Type 'exit' to quit.")
+async def main(client: LLMClient) -> None:
+    print("Cipher v0.1 — terminal shell. Type 'exit' to quit.")
     logger.info("CLI session started")
 
     while True:
@@ -35,7 +41,14 @@ async def main() -> None:
         if text.lower() in EXIT_COMMANDS:
             break
 
-        print(f"Cipher (echo): {text}")
+        try:
+            reply = await client.complete([{"role": "user", "content": text}])
+        except LLMClientError as e:
+            print(f"Cipher: [error] {e}")
+            logger.error("LLM call failed: %s", e)
+            continue
+
+        print(f"Cipher: {reply}")
 
     print("Goodbye.")
     logger.info("CLI session ended")
@@ -43,7 +56,19 @@ async def main() -> None:
 
 def run() -> None:
     configure_logging()
-    asyncio.run(main())
+
+    try:
+        settings = load_settings()
+    except ConfigError as e:
+        print(f"Cipher: [config error] {e}", file=sys.stderr)
+        sys.exit(1)
+
+    async def _run() -> None:
+        async with httpx.AsyncClient(timeout=60.0) as http_client:
+            client = OpenRouterClient(http_client, settings)
+            await main(client)
+
+    asyncio.run(_run())
 
 
 if __name__ == "__main__":
