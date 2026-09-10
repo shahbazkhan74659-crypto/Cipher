@@ -31,6 +31,7 @@ That end state is the destination, not the starting point. See `ROADMAP.md` for 
 | `README.md` | This file — orientation and navigation. |
 | `ARCHITECTURE.md` | The target (v1.0+) system architecture and the design principles every version must respect. |
 | `ROADMAP.md` | Version-by-version build plan (v0.1 → v1.0 → beyond), with a personalized learning path mapped to each version. |
+| `PHASES.md` | Implementation-phase breakdown for the version currently being built (v0.1) — the ordered build steps within a version. |
 | `SECURITY.md` | The security model: risk tiers, permission checks, sandboxing, audit logging. Non-negotiable, applies from v0.2 onward. |
 | `TOOLS.md` | The tool interface contract and the tool catalog, organized by capability domain. |
 | `MEMORY.md` | Cipher's own memory system design (short-term, long-term, knowledge/RAG) — distinct from any assistant's session memory. |

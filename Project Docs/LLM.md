@@ -29,6 +29,14 @@ Evaluated OpenRouter's live free-model catalog (`:free` suffix, $0 prompt/comple
 
 Re-evaluate this table if OpenRouter's free catalog changes materially, or when v0.2+ needs push the decision (e.g. a fallback turns out to be the better tool-calling fit).
 
+## Future Candidate: Automatic Multi-Provider Routing (OmniRoute)
+
+Evaluated and rejected for v0.1 (2026-09-10): **OmniRoute** (self-hosted, open-source AI gateway, 160-290+ providers, ~500+ models via one OpenAI-compatible endpoint, with automatic 4-tier fallback across free/cheap/paid providers). Not a fit today because its entire purpose — automatic multi-provider routing — is exactly the "Model routing (right model for the task, not one model for everything)" item listed under **Beyond v1.0** in `ROADMAP.md`. Using it now would mean building v1.0-era routing architecture underneath v0.1's "User -> LLM -> Response" step, on top of requiring a self-hosted gateway process v0.1 has no other need for.
+
+Additional caveats worth remembering if this is revisited later: its own docs note free tiers vanish without notice, and it lists providers whose terms of service prohibit proxy access — that needs a deliberate ToS/security review (`SECURITY.md`) before adoption, not just a capability check. It also obscures which underlying model actually answered a given request unless you inspect its logs, which cuts against the "retrieved/generated context should be traceable" principle this project already applies to RAG (`MEMORY.md`).
+
+**Revisit when:** Cipher actually reaches the "Beyond v1.0" model-routing item on its own terms — i.e., after v1.0's Planner exists and there's a real, stated reason to route across models/providers per task, not before.
+
 ## When Local Actually Becomes Relevant
 
 Not "as soon as I get a GPU." A concrete trigger, e.g.:
