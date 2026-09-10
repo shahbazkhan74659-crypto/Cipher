@@ -22,8 +22,8 @@ Decided (2026-09-10): **Python, asyncio, OpenRouter, Pydantic, pytest, `logging`
 ### Phase 1 — OpenRouter Setup and API Generation ✅ Completed
 Account confirmed, API key generated ("Cipher v0.1"), stored in `.env` (gitignored).
 
-### Phase 2 — Create a CLI for Cipher to Run on Terminal
-A terminal-runnable CLI shell for Cipher — no LLM wiring yet.
+### Phase 2 — Create a CLI for Cipher to Run on Terminal ✅ Completed
+A terminal-runnable CLI shell for Cipher — no LLM wiring yet. Delivered: `pyproject.toml` + `src/cipher/` package (hatchling, zero runtime deps), venv + editable install, async input loop (`python -m cipher` / `cipher` console script) with stdlib logging and a placeholder echo response, clean exit on `exit`/`quit`/Ctrl+C/Ctrl+D.
 
 ### Phase 3 — Connecting the CLI and OpenRouter Model
 Wire the CLI to OpenRouter so a request actually reaches the model and a response comes back.

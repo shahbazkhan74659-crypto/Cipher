@@ -22,7 +22,7 @@ That end state is the destination, not the starting point. See `ROADMAP.md` for 
 
 ## Project Status
 
-**Planning phase.** As of 2026-08-31, no code has been written. This documentation set exists to lock down the concept, the architecture, the security posture, and the incremental build plan before implementation starts on Cipher v0.1.
+**Implementation started.** Planning locked down the concept, architecture, security posture, and incremental build plan (through 2026-09-09). As of 2026-09-10, v0.1 ("Basic AI Assistant") is underway — see `PHASES.md` for the current phase breakdown and status.
 
 ## Document Map
 

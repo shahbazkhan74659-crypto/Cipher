@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cipher"
+version = "0.1.0.dev0"
+description = "Cipher — personal AI operating layer (v0.1: basic AI assistant)"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+cipher = "cipher.cli:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cipher"]

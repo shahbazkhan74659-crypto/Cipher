@@ -4,7 +4,14 @@ All notable changes to the Cipher project are recorded here. Format loosely foll
 
 ## [Unreleased]
 
-Nothing implemented yet. Next milestone: v0.1 — Basic AI Assistant (see `ROADMAP.md`).
+v0.1 — Basic AI Assistant is in progress (see `PHASES.md`).
+
+### Added
+- Phase 1: OpenRouter account confirmed, API key generated, stored in `.env` (gitignored).
+- Phase 2: Python project scaffolding — `pyproject.toml` (hatchling backend, no runtime dependencies yet), `src/cipher/` package, venv, editable install. Terminal CLI shell (`python -m cipher` / `cipher` command): async input loop (`asyncio.run` + `asyncio.to_thread`), stdlib logging to stderr, clean exit on `exit`/`quit`/Ctrl+C/Ctrl+D. Responses are a placeholder echo — no OpenRouter wiring yet (Phase 3).
+
+### Notes
+- Next milestone: Phase 3 — connect the CLI to the OpenRouter model.
 
 ## [0.0.0] - 2026-08-31 - Planning
 
