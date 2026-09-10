@@ -2,9 +2,10 @@
 
 Single request/response only — no streaming (Phase 4/5). Retries a bounded
 number of times, only for signals that are clearly transient (rate limit,
-provider-reported overload/5xx). This is NOT auto-fallback across models or
-providers (LLM.md: "fallbacks are manual, not routed") — it's retrying the
-one configured model a couple of times before surfacing a real failure.
+provider-reported overload/5xx, request timeouts, network errors). This is
+NOT auto-fallback across models or providers (LLM.md: "fallbacks are manual,
+not routed") — it's retrying the one configured model a couple of times
+before surfacing a real failure.
 """
 
 import asyncio
@@ -63,9 +64,9 @@ class OpenRouterClient(LLMClient):
                 raise _RetryableError(description) from e
             raise LLMClientError(description) from e
         except httpx.TimeoutException as e:
-            raise LLMClientError("Request to OpenRouter timed out.") from e
+            raise _RetryableError("Request to OpenRouter timed out.") from e
         except httpx.RequestError as e:
-            raise LLMClientError(f"Network problem reaching OpenRouter: {e}") from e
+            raise _RetryableError(f"Network problem reaching OpenRouter: {e}") from e
 
         try:
             data = response.json()

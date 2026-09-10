@@ -33,5 +33,19 @@ Interactive text in/out through the CLI, with basic multi-turn conversation. Del
 
 **Known limitation (2026-09-10):** conversation length is bounded only by the model's raw context window (262,144 tokens for `nemotron-3-super`), with no proactive tracking or trimming — very roughly 300-800 turns depending on message length, untested at that scale. If the window is actually exceeded, OpenRouter returns an error that Cipher displays readably (not a crash), but Phase 4's recovery only pops the single latest unanswered turn off history — if the *accumulated* history is already too large, that doesn't fix anything, and the only recovery is restarting the CLI (clearing all history). Real context management (trimming/summarization) is deliberately deferred to v0.5 (`MEMORY.md`), not a bug to fix now.
 
-### Phase 5 — Polishing and End-to-End Testing of v0.1 (User -> LLM -> Response)
-Harden and verify the full `User -> LLM -> Response` path end-to-end.
+### Phase 5 — Polishing and End-to-End Testing of v0.1 (User -> LLM -> Response) ✅ Completed
+Harden and verify the full `User -> LLM -> Response` path end-to-end. Delivered: `pytest` + `pytest-asyncio` added as a `dev` dependency group (`pyproject.toml`) — the stack decision named in the table above but never actually wired in until now. 27 tests across `tests/test_config.py`, `tests/test_openrouter_client.py`, and `tests/test_cli.py` cover config loading/`.env` parsing, the full retry/backoff matrix (retryable vs. terminal HTTP statuses, embedded provider errors, malformed/unexpected response shapes), and the CLI loop (blank input, exit commands, history pop-on-failure, EOF/Ctrl-C). OpenRouter responses are faked with `httpx.MockTransport` — already part of `httpx`, so no new mocking dependency and no real API calls burned by the test suite.
+
+Two real bugs surfaced and fixed, not by inspection but by actually exercising the failure paths:
+1. **Timeouts and network errors weren't retried.** `OpenRouterClient._complete_once()` retried HTTP 429/5xx and embedded 5xx-coded provider errors, but `httpx.TimeoutException`/`httpx.RequestError` were treated as immediately terminal — backwards, given `LLM.md`'s own documented timeout rates. Both now raise `_RetryableError` and go through the same bounded retry loop.
+2. **`UnicodeEncodeError` crash on real LLM output.** Manual end-to-end verification (below) crashed on the very first live reply: Windows' default console codepage (cp1252) can't encode characters ordinary LLM replies contain (em dashes, curly quotes, emoji). Fixed by reconfiguring `sys.stdout`/`sys.stderr` to UTF-8 (`errors="replace"` as a safety net) at the top of `cli.run()`.
+
+Also added: `.env.example` at the project root (documents `OPENROUTER_API_KEY` and the manual `CIPHER_MODEL` fallback override per `LLM.md`).
+
+**Manual end-to-end verification (2026-09-10), run against the real OpenRouter API:**
+1. Normal multi-turn conversation — model correctly recalled an earlier fact across turns; confirmed the Unicode fix (em dash, emoji in real replies rendered without crashing).
+2. `OPENROUTER_API_KEY` unset — clean `ConfigError` to stderr, exit code 1, before the async loop starts.
+3. Garbage API key — OpenRouter's 401 surfaced as a clean inline `Cipher: [error] ...` message, single attempt, no retry (correctly non-retryable), no crash.
+4. `CIPHER_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free` — the manual fallback override works end-to-end; this run also hit a real transient "Upstream error from Nvidia: Service temporarily overloaded" and the retry loop recovered on the second attempt, live-confirming the Step-1 fix's value.
+
+**Known limitation carried forward (unchanged from Phase 4):** context-window exhaustion recovery is still limited to popping the single latest unanswered turn — real context management is deferred to v0.5 (`MEMORY.md`), not a Phase 5 concern.

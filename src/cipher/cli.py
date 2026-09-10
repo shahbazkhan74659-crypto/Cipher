@@ -62,6 +62,12 @@ async def main(client: LLMClient) -> None:
 
 
 def run() -> None:
+    # Windows consoles often default stdout/stderr to a locale codepage (e.g.
+    # cp1252) rather than UTF-8, which crashes on ordinary LLM output (em
+    # dashes, curly quotes, etc.). Force UTF-8 so replies never crash the CLI.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
     configure_logging()
 
     try:

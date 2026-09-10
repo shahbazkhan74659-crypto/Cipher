@@ -12,8 +12,18 @@ dependencies = [
     "pydantic>=2",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.24",
+]
+
 [project.scripts]
 cipher = "cipher.cli:run"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cipher"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
