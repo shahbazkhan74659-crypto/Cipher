@@ -22,7 +22,7 @@ That end state is the destination, not the starting point. See `ROADMAP.md` for 
 
 ## Project Status
 
-**Implementation started.** Planning locked down the concept, architecture, security posture, and incremental build plan (through 2026-09-09). As of 2026-09-10, v0.1 ("Basic AI Assistant") is underway — see `PHASES.md` for the current phase breakdown and status.
+**v0.1 in progress.** Planning locked down the concept, architecture, security posture, and incremental build plan (through 2026-09-09). As of 2026-09-10, v0.1 ("Basic AI Assistant") has a working terminal CLI with real multi-turn conversation through OpenRouter — Phases 1-4 of 5 complete (OpenRouter setup, CLI scaffolding, model wiring, basic conversation). Remaining: Phase 5 (polishing and end-to-end testing). Full detail and decision history in `PHASES.md`, `LLM.md`, and `CHANGELOG.md`.
 
 ## Document Map
 
