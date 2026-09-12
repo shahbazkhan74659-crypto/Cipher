@@ -143,4 +143,4 @@ This project keeps a living documentation set under `Project Docs/`, each file w
 
 ## License
 
-Not yet decided.
+All rights reserved — see [`LICENSE`](LICENSE). This is not open-source software.
